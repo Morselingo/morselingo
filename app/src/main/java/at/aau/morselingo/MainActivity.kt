@@ -6,11 +6,13 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
+import at.aau.morselingo.navigation.AppNavHost
 import at.aau.morselingo.ui.theme.MorselingoTheme
 
 class MainActivity : ComponentActivity() {
@@ -19,29 +21,31 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MorselingoTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+               Morselingo()
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+fun Morselingo() {
+    val navController = rememberNavController()
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    MorselingoTheme {
-        Greeting("Android")
+    Scaffold(
+        topBar = {
+        //TODO: add topbar support with changing title depending on screen
+//            TopAppBar(
+//               title = { Text("Test") },
+//            )
+        },
+        modifier = Modifier.fillMaxSize()
+    ) {
+        innerPadding ->
+        AppNavHost(
+            navController = navController,
+            modifier = Modifier.padding(innerPadding)
+        )
     }
 }
