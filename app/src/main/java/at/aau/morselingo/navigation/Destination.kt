@@ -1,7 +1,6 @@
 package at.aau.morselingo.navigation
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MailOutline
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Settings
@@ -10,7 +9,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 private object Rout {
     const val PRACTICE = "practice"
     const val LEADERBOARD = "leaderboard"
-    const val CHAT = "chat"
     const val SETTINGS = "settings"
 }
 
@@ -24,8 +22,7 @@ enum class Destination(
 ) {
     LEADERBOARD(Rout.LEADERBOARD, "Leaderboard", Icons.Default.Menu, "Leaderboard", true),
     PRACTICE(Rout.PRACTICE, "Practice", Icons.Default.PlayArrow, "Practice", true),
-    CHAT(Rout.CHAT, "Chat", Icons.Default.MailOutline, "Chat", true),
-    SETTINGS(Rout.SETTINGS, "Settings", Icons.Default.Settings, "Settings", false);
+    SETTINGS(Rout.SETTINGS, "Settings", Icons.Default.Settings, "Settings", true);
 
     companion object {
         val defaultDestination = PRACTICE.route
