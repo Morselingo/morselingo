@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
+import at.aau.morselingo.navigation.AppNavBar
 import at.aau.morselingo.navigation.AppNavHost
 import at.aau.morselingo.ui.theme.MorselingoTheme
 
@@ -39,6 +40,9 @@ fun Morselingo() {
 //            TopAppBar(
 //               title = { Text("Test") },
 //            )
+        },
+        bottomBar = {
+            AppNavBar(navController = navController)
         },
         modifier = Modifier.fillMaxSize()
     ) {
