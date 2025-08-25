@@ -18,7 +18,11 @@ import kotlinx.serialization.json.decodeFromStream
  * ["word1", "word2", "word3", ...]
  * ```
  *
+ * **NOTE REGARDING AI USAGE:** Documentation was generated using ChatGPT-5 as well as hints on the IO parts
+ *
  * @param context Android context to access app assets.
+ *
+ * @author Elias Wassertheurer
  */
 class WordsRepository(private val context: Context)
 {
@@ -35,7 +39,7 @@ class WordsRepository(private val context: Context)
      * @throws IllegalArgumentException If validation for parameters fails.
      */
     @OptIn(ExperimentalSerializationApi::class)
-    suspend fun getFilteredWords(minLength: Int, lang: String, allowedChars: List<String>): List<String>
+    internal suspend fun getFilteredWords(minLength: Int, lang: String, allowedChars: List<String>): List<String>
     {
         return withContext(Dispatchers.IO)
         {
