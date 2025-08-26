@@ -2,13 +2,8 @@ package at.aau.morselingo.practice
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.launch
 
 class PracticeScreenViewModel : ViewModel() {
     private val _input = MutableStateFlow("")
@@ -33,16 +28,5 @@ class PracticeScreenViewModel : ViewModel() {
     private fun decodeMorse(morse: String): String{
         return if (morse.length == 6) "a" else ""
     }
-/*
-    private val _inputEvent = MutableSharedFlow<String>()
-    val inputEvents: SharedFlow<String> = _inputEvent.asSharedFlow()
-
-    fun onEvent(symbol: String){
-        //onInput(symbol)
-        viewModelScope.launch {
-            _inputEvent.emit(symbol)
-        }
-    }
-*/
 
 }

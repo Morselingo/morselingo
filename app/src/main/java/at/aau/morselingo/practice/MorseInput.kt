@@ -32,7 +32,7 @@ import kotlin.system.measureTimeMillis
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
 
-const val dot = "."
+const val dot = "·"
 const val line = "-"
 const val space = " "
 const val spaceSymbol = "␣"
@@ -59,11 +59,11 @@ fun MorseInput(
             ) {
                 if (clickSpeed == 0L) {
                     MyButton(dot, 2f) { onInput(dot) }
-                    MyButton(spaceSymbol, 3f) { onInputProcess(space) }
+                    MyButton(spaceSymbol, 3f) { onInput(space) }
                     MyButton(line, 2f) { onInput(line) }
                 }else{
                     Spacer(modifier = Modifier.weight(2f))
-                    MorseButton("test", 3f, clickSpeed, onInput = onInput, onInputProcess = onInputProcess)
+                    MorseButton("test", 3f, clickSpeed, onInput = onInput, onInputProcess = onInput)
                     Spacer(modifier = Modifier.weight(2f))
                 }
             }
