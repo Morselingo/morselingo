@@ -41,7 +41,6 @@ const val wordSeparationTime = 2
 @Composable
 fun MorseInput(
     onInput: (String) -> Unit,
-    onInputProcess: (String) -> Unit,
     clickSpeed: Long = 0, //longTouchTime
 ) {
 

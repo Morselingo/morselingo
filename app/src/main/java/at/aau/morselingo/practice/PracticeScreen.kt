@@ -4,19 +4,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun PracticeScreen(
-   viewModel: PracticeScreenViewModel = viewModel()
+   viewModel: PracticeScreenViewModel = viewModel(factory = PracticeScreenViewModelFactory(
+      LocalContext.current
+   ))
 ) {
-   val text by viewModel.input.collectAsState()
-   val letterText by viewModel.inputLetters.collectAsState()
+   val text by viewModel.userInputForAttempt.collectAsState()
 
    MorseInput(
       viewModel::onInput,
-      viewModel::preprocessInput,
       clickSpeed = 0,
    )
 
-   MorsePracticeDisplay("Hallo World", text)
+   MorsePracticeDisplay(viewModel.expectedText, text)
 }
