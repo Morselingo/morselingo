@@ -29,4 +29,6 @@ class PracticeScreenViewModel : ViewModel() {
         return if (morse.length == 6) "a" else ""
     }
 
+
+
 }
