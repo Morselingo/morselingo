@@ -31,6 +31,6 @@ fun PracticeScreen(
          .padding(16.dp),
    ) {
       MorsePracticeDisplay(viewModel.expectedText, userInputForCurrentAttempt)
-      LiveStatsPanel(statsForCurrentAttempt)
+      LiveStatsPanel(statsForCurrentAttempt, viewModel.expectedText)
    }
 }
