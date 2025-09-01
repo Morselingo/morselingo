@@ -20,6 +20,8 @@ fun PracticeScreen(
    val userInputForCurrentAttempt by viewModel.userInputForAttempt.collectAsState()
    val statsForCurrentAttempt by viewModel.stats.collectAsState()
 
+   //TODO: figure out how to do the reset when the test is done
+
    MorseInput(
       viewModel::onInput,
       clickSpeed = 0,
