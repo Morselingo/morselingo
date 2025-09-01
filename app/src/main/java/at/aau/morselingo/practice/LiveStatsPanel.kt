@@ -31,7 +31,7 @@ import java.util.Locale
 @Composable
 fun LiveStatsPanel(stats: MorseStats, expectedText: String) {
 
-    val progress = 0.5f
+    val progress: Float = stats.totalSymbols.toFloat() / expectedText.length
 
     val averageTimePerChar = stats.averageTimePerChar
         .values
