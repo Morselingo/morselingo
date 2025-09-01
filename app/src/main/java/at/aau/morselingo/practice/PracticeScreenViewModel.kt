@@ -68,9 +68,7 @@ class PracticeScreenViewModel(
         val timeTaken = System.currentTimeMillis() - charStartTime
         updateStatsForCharCompletion(char, timeTaken, isCorrect)
 
-        Log.d("CUSTOMLOGGER", stats.value.toDebugString())
-
-        charStartTime = System.currentTimeMillis() //TODO: make sure the stats are correct
+        charStartTime = System.currentTimeMillis()
 
         _currentLetterMorseInput.value = ""
         _currentIndex.value++
