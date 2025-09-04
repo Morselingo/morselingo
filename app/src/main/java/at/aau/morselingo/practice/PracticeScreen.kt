@@ -19,6 +19,8 @@ fun PracticeScreen(
 ) {
    val userInputForCurrentAttempt by viewModel.userInputForAttempt.collectAsState()
    val statsForCurrentAttempt by viewModel.stats.collectAsState()
+   val currentIndex by viewModel.currentIndex.collectAsState()
+   val showHints = true // TODO: get from settings
 
    //TODO: figure out how to do the reset when the test is done
 
@@ -34,5 +36,9 @@ fun PracticeScreen(
    ) {
       MorsePracticeDisplay(viewModel.expectedText, userInputForCurrentAttempt)
       LiveStatsPanel(statsForCurrentAttempt, viewModel.expectedText)
+
+      if (showHints) {
+         HintPanel(viewModel.expectedText, currentIndex)
+      }
    }
 }

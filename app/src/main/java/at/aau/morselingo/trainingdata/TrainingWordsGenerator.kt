@@ -4,54 +4,15 @@ import kotlin.math.exp
 import kotlin.math.roundToInt
 import kotlin.random.Random
 
-/**
- * Generates a list of training words for a given level and language.
- *
- * The generator combines:
- * 1) A **minimum word length** that grows with the level (and is influenced by how many letters
- *    are unlocked), and
- * 2) A **word count** that grows along an exponential curve toward a fixed cap.
- *
- * Words are loaded via [WordsRepository] from app assets, filtered by language, allowed characters,
- * and the computed minimum length, then sampled randomly without duplicates.
- *
- * ### Growth models
- * - **Min length**:
- *   Uses an exponential approach to a cap (e.g., 6), with the rise speed controlled by an
- *   *accelerator* that shrinks as more characters are unlocked (i.e., more characters → faster approach).
- * - **Word count**:
- *   Uses an exponential curve that slowly converges to `wordCap` (e.g., 20).
- *
- * ### Concurrency
- * This class relies on suspending I/O in [WordsRepository], so [generate] is `suspend` and should be
- * called from a coroutine context (e.g., `lifecycleScope`, `LaunchedEffect`, or `viewModelScope`).
- *
- * **NOTE REGARDING AI USAGE:** Documentation was generated using ChatGPT-5 as well as hints on the mathematical parts
- *
- * @property repository Data source for reading and filtering words from assets.
- * @property random Random number generator used for sampling words (injectable for tests).
- *
- * @author Elias Wassertheurer
- */
 class TrainingWordsGenerator(private val repository: WordsRepository, private val random: Random = Random)
 {
     companion object
     {
-        /**
-         * Size of the base alphabet used for scaling the acceleration reduction.
-         */
         private const val ALPHABET_SIZE = 26.0
     }
 
     /**
      * Builds a list of training words for the given [level] and [lang].
-     *
-     * Steps:
-     * 1) Validate the level.
-     * 2) Compute the minimum word length for the level and the current number of allowed characters.
-     * 3) Load and filter the word pool from assets via [WordsRepository.getFilteredWords].
-     * 4) Compute how many words should be returned for the level.
-     * 5) Randomly pick that many distinct words from the pool (or return all if the pool is smaller).
      *
      * @param level Game level (must be > 0).
      * @param lang Language code used to select the asset file (e.g., `"de"`, `"en"`).
@@ -164,17 +125,6 @@ class TrainingWordsGenerator(private val repository: WordsRepository, private va
     }
 
     /**
-     * Validates that [level] is strictly positive.
-     *
-     * @param level Level to validate.
-     * @throws IllegalArgumentException if [level] <= 0.
-     */
-    private fun validateLevel(level: Int)
-    {
-        require(level > 0) { "level must be > 0 (was $level)!" }
-    }
-
-    /**
      * Computes how much the **accelerator** should be reduced based on the number of
      * unlocked/allowed characters.
      *
@@ -208,5 +158,10 @@ class TrainingWordsGenerator(private val repository: WordsRepository, private va
         }
 
         return (numberOfAllowedChars.toDouble() / ALPHABET_SIZE) * reductionPercentage
+    }
+
+    private fun validateLevel(level: Int)
+    {
+        require(level > 0) { "level must be > 0 (was $level)!" }
     }
 }

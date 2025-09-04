@@ -59,6 +59,8 @@ dependencies {
     implementation(libs.gson)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.material.icons.extended)
+    implementation(libs.androidx.foundation)
 
     ksp(libs.androidx.room.compiler)
 
