@@ -19,7 +19,7 @@ class PracticeScreenViewModel(
     private val _stats: MutableStateFlow<MorseStats> = MutableStateFlow(MorseStats())
     val stats: StateFlow<MorseStats> = _stats.asStateFlow()
 
-    val expectedText = "Test" //TODO: when updating the text, make sure that you reset everything else as well and potentially save
+    val expectedText = "Test Test Test Test" //TODO: when updating the text, make sure that you reset everything else as well and potentially save
 
     private val _currentLetterMorseInput = MutableStateFlow("")
 
