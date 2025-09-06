@@ -20,9 +20,10 @@ fun PracticeScreen(
    val userInputForCurrentAttempt by viewModel.userInputForAttempt.collectAsState()
    val statsForCurrentAttempt by viewModel.stats.collectAsState()
    val currentIndex by viewModel.currentIndex.collectAsState()
+   val expectedText by viewModel.expectedText.collectAsState()
    val showHints = true // TODO: get from settings
 
-   //TODO: figure out how to do the reset when the test is done
+   // TODO: figure out how to do the reset when the test is done
 
    MorseInput(
       viewModel::onInput,
@@ -34,11 +35,11 @@ fun PracticeScreen(
          .fillMaxWidth()
          .padding(16.dp),
    ) {
-      MorsePracticeDisplay(viewModel.expectedText, userInputForCurrentAttempt)
-      LiveStatsPanel(statsForCurrentAttempt, viewModel.expectedText)
+      MorsePracticeDisplay(expectedText, userInputForCurrentAttempt)
+      LiveStatsPanel(statsForCurrentAttempt, expectedText)
 
       if (showHints) {
-         HintPanel(viewModel.expectedText, currentIndex)
+         HintPanel(expectedText, currentIndex)
       }
    }
 }

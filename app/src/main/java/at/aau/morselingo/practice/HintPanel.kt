@@ -118,15 +118,29 @@ private fun buildHintMessage(currentChar: Char?): AnnotatedString {
 
     return buildAnnotatedString {
         if (currentChar != null) {
-            append("The letter ")
-            withStyle(SpanStyle(fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)) {
-                append(currentChar.toString())
+            if (currentChar == ' ') {
+                append("Press the space button!")
+            } else {
+                append("The letter ")
+                withStyle(
+                    SpanStyle(
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = FontFamily.Monospace
+                    )
+                ) {
+                    append(currentChar.toString())
+                }
+                append(" is equivalent to ")
+                withStyle(
+                    SpanStyle(
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = FontFamily.Monospace
+                    )
+                ) {
+                    append(morse)
+                }
+                append(" in morse code!")
             }
-            append(" is equivalent to ")
-            withStyle(SpanStyle(fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)) {
-                append(morse)
-            }
-            append(" in morse code!")
         } else {
             append("No character displayed!")
         }
