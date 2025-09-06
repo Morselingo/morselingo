@@ -8,40 +8,70 @@ import androidx.lifecycle.viewModelScope
 import at.aau.morselingo.data.MorseStats
 import at.aau.morselingo.data.MorseStatsRepository
 import at.aau.morselingo.data.MorselingoDatabase
+import at.aau.morselingo.trainingdata.TrainingWordsGenerator
+import at.aau.morselingo.trainingdata.WordsRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class PracticeScreenViewModel(
-    private val repository: MorseStatsRepository
+    private val repository: MorseStatsRepository,
+    private val wordsGenerator: TrainingWordsGenerator
 ) : ViewModel() {
     private val _stats: MutableStateFlow<MorseStats> = MutableStateFlow(MorseStats())
     val stats: StateFlow<MorseStats> = _stats.asStateFlow()
 
-    val expectedText = "Test Test Test Test" //TODO: when updating the text, make sure that you reset everything else as well and potentially save
+    private val _level = MutableStateFlow(0)
+    val level: StateFlow<Int> = _level.asStateFlow()
+
+    private val _expectedText = MutableStateFlow("-")
+    val expectedText: StateFlow<String> = _expectedText.asStateFlow()
 
     private val _currentLetterMorseInput = MutableStateFlow("")
 
     private val _currentIndex = MutableStateFlow(0)
     val currentIndex: StateFlow<Int> = _currentIndex.asStateFlow()
 
-    //For display reasons
+    // For display reasons
     private val _userInputForAttempt = MutableStateFlow("")
     val userInputForAttempt = _userInputForAttempt.asStateFlow()
 
-    var charStartTime: Long = 0L //0 represents that timing has not started
+    var charStartTime: Long = 0L // 0 represents that timing has not started
+    var lang = "en"
+    var allowedChars = listOf("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z")
 
+    init {
+        reload()
+    }
 
+    fun reload() {
+        viewModelScope.launch {
+            resetInputState()
+
+            _level.value++
+
+            val text = getTrainingWords(_level.value, lang, allowedChars)
+            _expectedText.value = text
+        }
+    }
+
+    private fun resetInputState() {
+        _expectedText.value = "-"
+        _currentIndex.value = 0
+        _userInputForAttempt.value = ""
+        _currentLetterMorseInput.value = ""
+        charStartTime = 0L
+    }
 
     fun onInput(symbol: String) {
-        if (_currentIndex.value >= expectedText.length) {
-            //TODO: eventually start a new attempt
-            Log.d("CUSTOMLOGGER", "Out of bounds should start new attempt")
+        val text = expectedText.value
+        if (text.isEmpty() || _currentIndex.value >= text.length - 1) {
+            reload()
             return
         }
 
-        //start timer for first char
+        // start timer for first char
         if (charStartTime == 0L) {
             charStartTime = System.currentTimeMillis()
         }
@@ -53,12 +83,12 @@ class PracticeScreenViewModel(
         _userInputForAttempt.value = newUserInputForAttempt
 
         // validation
-        val currentChar = expectedText[_currentIndex.value]
+        val currentChar = text[_currentIndex.value]
         val expectedMorseForCurrentChar = currentChar.toMorse()!! //TODO: better error handling
         val currentInput = _currentLetterMorseInput.value
 
         if (currentInput.length == expectedMorseForCurrentChar.length) {
-            //we know that they should match if it is correct
+            // we know that they should match if it is correct
             val correct = currentInput == expectedMorseForCurrentChar
             completeChar(currentChar, correct)
         }
@@ -110,16 +140,28 @@ class PracticeScreenViewModel(
         _userInputForAttempt.value = ""
     }
 
+    private suspend fun getTrainingWords(level: Int, lang: String, allowedChars: List<String>): String {
+        val words = wordsGenerator.generate(
+            level = level,
+            lang = lang,
+            allowedChars = allowedChars
+        )
+        return words.joinToString(" ")
+    }
 }
 
 class PracticeScreenViewModelFactory(current: Context) : ViewModelProvider.Factory {
     private val database = MorselingoDatabase.getInstance(current)
     private val repository = MorseStatsRepository(database.morseStatsDao())
 
+    private val wordsRepository = WordsRepository(current)
+
+    private val wordsGenerator = TrainingWordsGenerator(wordsRepository)
+
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(PracticeScreenViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return PracticeScreenViewModel(repository) as T
+            return PracticeScreenViewModel(repository, wordsGenerator) as T
         }
         throw IllegalArgumentException("Unknown Viewmodel Class")
     }
