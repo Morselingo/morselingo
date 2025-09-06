@@ -7,5 +7,4 @@ class StatisticsScreenViewModel(
     private val repository: MorseStatsRepository
 ) : ViewModel() {
 
-
 }
