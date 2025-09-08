@@ -10,8 +10,11 @@ import at.aau.morselingo.data.MorseStatsRepository
 import at.aau.morselingo.data.MorselingoDatabase
 import at.aau.morselingo.trainingdata.TrainingWordsGenerator
 import at.aau.morselingo.trainingdata.WordsRepository
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
@@ -24,6 +27,12 @@ class PracticeScreenViewModel(
 
     private val _level = MutableStateFlow(0)
     val level: StateFlow<Int> = _level.asStateFlow()
+
+    sealed class UiEvent {
+        data class LevelUp(val level: Int) : UiEvent()
+    }
+    private val _events = MutableSharedFlow<UiEvent>()
+    val events: SharedFlow<UiEvent> = _events.asSharedFlow()
 
     private val _expectedText = MutableStateFlow("-")
     val expectedText: StateFlow<String> = _expectedText.asStateFlow()
@@ -50,6 +59,10 @@ class PracticeScreenViewModel(
             resetInputState()
 
             _level.value++
+
+            if (_level.value != 1) {
+                _events.emit(UiEvent.LevelUp(_level.value))
+            }
 
             val text = getTrainingWords(_level.value, lang, allowedChars)
             _expectedText.value = text
