@@ -1,7 +1,6 @@
 package at.aau.morselingo.practice
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -75,6 +74,7 @@ class PracticeScreenViewModel(
         _userInputForAttempt.value = ""
         _currentLetterMorseInput.value = ""
         charStartTime = 0L
+        saveStatsAndReset()
     }
 
     fun onInput(symbol: String) {
