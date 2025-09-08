@@ -29,7 +29,7 @@ data class StatisticsData(
 )
 
 class StatisticsScreenViewModel(
-    private val repository: MorseStatsRepository
+    repository: MorseStatsRepository
 ) : ViewModel() {
 
     val statisticalData = repository.getStats()
