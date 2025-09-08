@@ -17,42 +17,46 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import java.text.DecimalFormat
-import kotlin.random.Random
 
 @Composable
-fun StatisticsScreen() {
-    Column(
-
-    ) {
+fun StatisticsScreen(
+    viewModel: StatisticsScreenViewModel = viewModel(factory = StatisticsScreenViewModelFactory(
+        LocalContext.current
+    ))
+) {
+    val stats: StatisticsData by viewModel.statisticalData.collectAsState()
+    val characters = listOf("a", "b", "c", "d", "e", "f", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "␣")
+    Column() {
         AggregatedStats(
-            averageLetterTime = 1200L,
-            totalSymbolsCorrect = 100,
-            totalSymbolsAttempted = 200
+            averageLetterTime = stats.averageLetterTime,
+            totalSymbolsCorrect = stats.totalSymbolsCorrect,
+            totalSymbolsAttempted = stats.totalSymbolsAttempted
         )
-        CharStatGrid()
+        CharStatGrid(chars = stats.letterData.map { it.key to it.value })
     }
 }
 
 @Composable
-fun CharStatGrid() {
-    val characters = listOf("a", "b", "c", "d", "e", "f", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "␣")
-    val random = Random(1)
+fun CharStatGrid(chars: List<Pair<Char, LetterStats>>) {
 
     LazyVerticalGrid(
-        columns = GridCells.Fixed(5),
+        columns = GridCells.Fixed(4),
         modifier = Modifier.fillMaxWidth(),
         contentPadding = PaddingValues(8.dp)
     ) {
-        items(characters) { char ->
-            CharTile(char, random.nextFloat())
+        items(chars) { (char, stats) ->
+            CharTile(char = char.toString(), score = stats.score)
         }
     }
 }
@@ -71,7 +75,6 @@ fun CharTile(char: String, score: Float) {
         colors = CardDefaults.cardColors(backgroundColor)
     ) {
         Box(
-            contentAlignment = Alignment.Center,
             modifier = Modifier.fillMaxSize()
         ) {
             Text(
@@ -80,10 +83,19 @@ fun CharTile(char: String, score: Float) {
                 style = MaterialTheme.typography.displayLarge.copy(
                     fontSize = 40.sp,
                     fontWeight = FontWeight.ExtraBold
-                )
+                ),
+                modifier = Modifier.align(Alignment.Center)
+            )
+            //TODO: maybe add a toggle for the score
+            Text(
+                text = DecimalFormat("0.00").format(score),
+                color = textColor,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(6.dp)
             )
         }
-
     }
 }
 
@@ -153,22 +165,4 @@ fun Stat(value: String, label: String) {
             color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
         )
     }
-}
-
-//TODO: move this to the viewmodel and just return a color
-fun scoreToColor(score: Float): Color {
-    val clamped = score.coerceIn(0f, 1f)
-    val green = Color(0xFF4CAF50)
-    val yellow = Color(0xFFFFEB3B)
-    val red = Color(0xFFF44336)
-
-    return when {
-        clamped <= 0.5f -> lerp(green, yellow, clamped / 0.5f)
-        else -> lerp(yellow, red, (clamped - 0.5f) / 0.5f)
-    }
-}
-
-fun Color.isDark(): Boolean {
-    val luminance = 0.299 * red + 0.587 * green + 0.114 * blue
-    return luminance < 0.5
 }
