@@ -55,6 +55,9 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.material3)
     implementation(libs.ui)
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.datastore.core)
+
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

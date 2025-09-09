@@ -6,32 +6,44 @@ import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import at.aau.morselingo.leaderboard.LeaderBoardScreen
 import at.aau.morselingo.practice.PracticeScreen
+import at.aau.morselingo.settings.LocalSettings
 import at.aau.morselingo.settings.SettingsScreen
 
 @Composable
 fun AppNavHost(
+    modifier: Modifier = Modifier,
     navController: NavHostController,
-    modifier: Modifier = Modifier
+    viewModel: NavigationViewModel = viewModel(factory = NavigationViewModelFactory(
+        LocalContext.current
+    ))
 ) {
-    NavHost(
-        navController = navController,
-        startDestination = Destination.defaultDestination,
-        modifier = modifier
-    ) {
-        composable(Destination.PRACTICE.route) { PracticeScreen() }
-        composable(Destination.LEADERBOARD.route) { LeaderBoardScreen() }
-        composable(Destination.SETTINGS.route) { SettingsScreen() }
+    val settings by viewModel.settings.collectAsState()
+
+    CompositionLocalProvider(LocalSettings provides settings) {
+        NavHost(
+            navController = navController,
+            startDestination = Destination.defaultDestination,
+            modifier = modifier
+        ) {
+            composable(Destination.PRACTICE.route) { PracticeScreen() }
+            composable(Destination.LEADERBOARD.route) { LeaderBoardScreen() }
+            composable(Destination.SETTINGS.route) { SettingsScreen() }
+        }
     }
 }
 
