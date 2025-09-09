@@ -57,6 +57,8 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.material3)
     implementation(libs.ui)
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.datastore.core)
     implementation(libs.gson)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.runtime)
