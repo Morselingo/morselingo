@@ -159,7 +159,7 @@ class PracticeScreenViewModel(
             lang = lang,
             allowedChars = allowedChars
         )
-        return words.joinToString(" ")
+        return words.joinToString("␣")
     }
 }
 

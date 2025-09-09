@@ -34,7 +34,6 @@ import kotlinx.coroutines.delay
 
 const val dot = "·"
 const val line = "-"
-const val space = " "
 const val spaceSymbol = "␣"
 const val wordSeparationTime = 2
 
@@ -58,7 +57,7 @@ fun MorseInput(
             ) {
                 if (clickSpeed == 0L) {
                     MyButton(dot, 2f) { onInput(dot) }
-                    MyButton(spaceSymbol, 3f) { onInput(space) }
+                    MyButton(spaceSymbol, 3f) { onInput(spaceSymbol) }
                     MyButton(line, 2f) { onInput(line) }
                 }else{
                     Spacer(modifier = Modifier.weight(2f))
@@ -134,7 +133,7 @@ fun RowScope.MorseButton(
                         timerJob = launch {
                             delay(longTouchTime * wordSeparationTime)
                             Log.d("MorseButton", "Delay finished: "+longTouchTime*wordSeparationTime)
-                            onInputProcess(space)
+                            onInputProcess(spaceSymbol)
                             Log.d("MorseButton", "send space")
                         }
                     }

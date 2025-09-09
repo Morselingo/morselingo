@@ -11,7 +11,7 @@ object MorseUtils {
         'Y' to "-·--",  'Z' to "--··",
         '1' to "·----", '2' to "··---", '3' to "···--", '4' to "····-",
         '5' to "·····", '6' to "-····", '7' to "--···", '8' to "---··",
-        '9' to "----·", '0' to "-----", ' ' to " "
+        '9' to "----·", '0' to "-----", ' ' to "␣", '␣' to "␣"
     )
 }
 
@@ -19,7 +19,7 @@ fun Char.toMorse(): String? {
     return MorseUtils.morseMap[this.uppercaseChar()]
 }
 
-fun String.toMorse(separator: String = " "): String {
+fun String.toMorse(separator: String = "␣"): String {
     return this.uppercase()
         .map { MorseUtils.morseMap[it] ?: "?" }
         .joinToString(separator)
