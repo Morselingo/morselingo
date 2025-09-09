@@ -54,7 +54,7 @@ fun CharStatGrid(chars: List<Pair<Char, LetterStats>>) {
         modifier = Modifier.fillMaxWidth(),
         contentPadding = PaddingValues(8.dp)
     ) {
-        items(chars) { (char, stats) ->
+        items(chars.sortedBy { it.first }) { (char, stats) ->
             CharTile(char = char.toString(), score = stats.score)
         }
     }
