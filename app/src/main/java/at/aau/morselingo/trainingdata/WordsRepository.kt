@@ -7,23 +7,8 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
+import org.json.JSONArray
 
-/**
- * Repository responsible for loading and filtering training words
- * from the app's asset directory.
- *
- * The expected file structure inside `assets/trainingdata/data`:
- *
- * ```
- * ["word1", "word2", "word3", ...]
- * ```
- *
- * **NOTE REGARDING AI USAGE:** Documentation was generated using ChatGPT-5 as well as hints on the IO parts
- *
- * @param context Android context to access app assets.
- *
- * @author Elias Wassertheurer
- */
 class WordsRepository(private val context: Context)
 {
     /**
@@ -115,23 +100,11 @@ class WordsRepository(private val context: Context)
         return allowedChars.map { it.lowercase() }.toSet()
     }
 
-    /**
-     * Validates that the minimum word length is greater than zero.
-     *
-     * @throws IllegalArgumentException if `minLength` <= 0.
-     */
     private fun validateMinLength(minLength: Int)
     {
         require(minLength > 0) { "minLength must be > 0 (was $minLength)!" }
     }
 
-    /**
-     * Validates that the allowed characters list:
-     * - is not empty
-     * - only contains single-character strings
-     *
-     * @throws IllegalArgumentException if the list is invalid.
-     */
     private fun validateAllowedChars(allowedChars: List<String>)
     {
         require(allowedChars.isNotEmpty()) { "allowedChars must not be empty!" }

@@ -19,7 +19,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import at.aau.morselingo.leaderboard.LeaderBoardScreen
+import at.aau.morselingo.statistics.StatisticsScreen
 import at.aau.morselingo.practice.PracticeScreen
 import at.aau.morselingo.settings.LocalSettings
 import at.aau.morselingo.settings.SettingsScreen
@@ -41,10 +41,9 @@ fun AppNavHost(
             modifier = modifier
         ) {
             composable(Destination.PRACTICE.route) { PracticeScreen() }
-            composable(Destination.LEADERBOARD.route) { LeaderBoardScreen() }
+            composable(Destination.STATISTICS.route) { StatisticsScreen() }
             composable(Destination.SETTINGS.route) { SettingsScreen() }
         }
-    }
 }
 
 @Composable

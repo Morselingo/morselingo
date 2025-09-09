@@ -2,12 +2,16 @@ package at.aau.morselingo.practice
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,32 +24,59 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+data class LetterData(val letter: Char, val userInput: String)
+
 @Composable
-fun MorsePracticeDisplay(expectedText: String, userInput: String) {
+fun MorsePracticeDisplay(
+    expectedText: String,
+    userInput: String,
+) {
+    val listState = rememberLazyListState()
     val upperExpected = expectedText.uppercase()
-    var currentIndex = 0
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        horizontalArrangement = Arrangement.Center,
-    ) {
-        upperExpected.forEach { char ->
-            val morseCode = char.toMorse()
-            val morseLength = morseCode?.length!!
+    val letterData = remember(upperExpected, userInput) {
+        var currentIndex = 0
+        upperExpected.map { char ->
+            val morseCode = char.toMorse() ?: ""
+            val morseCodeLength = morseCode.length
 
-            val userSubInput = if (currentIndex + morseLength <= userInput.length) {
-                userInput.substring(currentIndex, (currentIndex + morseLength).coerceAtMost(userInput.length))
+            val userSubInput = if (currentIndex + morseCodeLength <= userInput.length) {
+                userInput.substring(currentIndex, (currentIndex + morseCodeLength).coerceAtMost(userInput.length))
             } else if (currentIndex < userInput.length) {
                 userInput.substring(currentIndex)
             } else {
                 ""
             }
 
-            MorseLetter(char, userSubInput)
-            currentIndex += morseLength
+            currentIndex += morseCodeLength
+            LetterData(char, userSubInput)
         }
+    }
+
+    val currentLetterIndex = remember(letterData) {
+        val nextIndex = letterData.indexOfFirst { it.userInput.length < (it.letter.toMorse()?.length ?: 0) }
+        when {
+            userInput.isEmpty() -> 0
+            nextIndex != -1 && nextIndex > 0 -> nextIndex - 1
+            nextIndex == 0 -> 0
+            else -> letterData.lastIndex
+        }
+    }
+
+    LazyRow(
+        state = listState,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        horizontalArrangement = Arrangement.Center,
+    ) {
+        items(letterData) { letter ->
+            MorseLetter(letter.letter, letter.userInput)
+        }
+    }
+
+    LaunchedEffect(userInput) {
+        listState.animateScrollToItem(currentLetterIndex)
     }
 }
 

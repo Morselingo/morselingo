@@ -8,7 +8,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 
 private object Rout {
     const val PRACTICE = "practice"
-    const val LEADERBOARD = "leaderboard"
+    const val STATISTICS = "leaderboard"
     const val SETTINGS = "settings"
 }
 
@@ -20,7 +20,7 @@ enum class Destination(
     val contentDescription: String,
     val displayInNavigation: Boolean,
 ) {
-    LEADERBOARD(Rout.LEADERBOARD, "Leaderboard", Icons.Default.Menu, "Leaderboard", true),
+    STATISTICS(Rout.STATISTICS, "Statistics", Icons.Default.Menu, "Statistics", true),
     PRACTICE(Rout.PRACTICE, "Practice", Icons.Default.PlayArrow, "Practice", true),
     SETTINGS(Rout.SETTINGS, "Settings", Icons.Default.Settings, "Settings", true);
 
