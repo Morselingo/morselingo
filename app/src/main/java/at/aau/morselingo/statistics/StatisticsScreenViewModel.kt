@@ -46,8 +46,8 @@ fun calculateScore(
     totalSymbols: Int,
     avgTime: Long,
     idealTime: Long = 2000L,
-    weightAccuracy: Float = 0.7f,
-    weightTime: Float = 0.3f
+    weightAccuracy: Float = 0.85f,
+    weightTime: Float = 0.15f
 ): Float {
     if (totalSymbols == 0) return 0f
 
@@ -64,8 +64,8 @@ fun scoreToColor(score: Float): Color {
     val red = Color(0xFFF44336)
 
     return when {
-        clamped <= 0.5f -> lerp(green, yellow, clamped / 0.5f)
-        else -> lerp(yellow, red, (clamped - 0.5f) / 0.5f)
+        clamped <= 0.5f -> lerp(red, yellow, clamped / 0.5f)
+        else -> lerp(yellow, green, (clamped - 0.5f) / 0.5f)
     }
 }
 
