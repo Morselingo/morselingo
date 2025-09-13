@@ -1,6 +1,5 @@
 package at.aau.morselingo.practice
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -24,11 +23,13 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import at.aau.morselingo.settings.LocalSettings
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
 import kotlin.system.measureTimeMillis
@@ -42,9 +43,9 @@ const val wordSeparationTime = 2
 
 @Composable
 fun MorseInput(
-    onInput: (String) -> Unit,
-    clickSpeed: Long = 0, //longTouchTime
+    onInput: (String) -> Unit
 ) {
+    val settings = LocalSettings.current
     Column(
         verticalArrangement = Arrangement.Bottom,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -59,13 +60,13 @@ fun MorseInput(
                 .fillMaxWidth()
                 .padding(8.dp)
         ) {
-            if (clickSpeed == 0L) {
+            if (!settings.simpleInput) {
                 MyButton(dot) { onInput(dot) }
                 MyButton(spaceSymbol) { onInput(spaceSymbol) }
                 MyButton(line) { onInput(line) }
             } else {
                 Spacer(modifier = Modifier.weight(2f))
-                MorseButton("test", 3f, clickSpeed, onInput = onInput, onInputProcess = onInput)
+                MorseButton("Tap", 3f, settings.longTouchTime, onInput = onInput)
                 Spacer(modifier = Modifier.weight(2f))
             }
         }
@@ -105,50 +106,40 @@ fun RowScope.MorseButton(
     text: String,
     size: Float,
     longTouchTime: Long,
-    onInput: (String) -> Unit,
-    onInputProcess: (String) -> Unit
+    onInput: (String) -> Unit
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     Box(
         modifier = Modifier
             .weight(size)
             .aspectRatio(1f)
+            .clip(MaterialTheme.shapes.medium)
             .background(MaterialTheme.colorScheme.primary)
             .clickable(interactionSource = interactionSource, indication = ripple(), onClick = {})
             .pointerInput(Unit) {
                 coroutineScope {
                     var timerJob: Job? = null // for timing end of word
-                    Log.d("MorseButton", "Button initialized?")
 
                     while (true) {
                         var up: PointerInputChange? = null
                         awaitPointerEventScope {
                             awaitFirstDown()
-                            Log.d("MorseButton", "Button Pressed: Down")
                             timerJob?.cancel()
                             val duration = measureTimeMillis {
                                 up = waitForUpOrCancellation()
                             }
-                            Log.d("MorseButton", "Button Pressed: Up")
                             if (up == null) {
                                 // Handle error
                             }
                             if (duration < longTouchTime) {
                                 onInput(dot)
-                                Log.d("MorseButton", "Send dot")
                             } else {
                                 onInput(line)
-                                Log.d("MorseButton", "Send line")
                             }
 
                             timerJob = launch {
                                 delay(longTouchTime * wordSeparationTime)
-                                Log.d(
-                                    "MorseButton",
-                                    "Delay finished: " + longTouchTime * wordSeparationTime
-                                )
-                                onInputProcess(spaceSymbol)
-                                Log.d("MorseButton", "send space")
+                                onInput(spaceSymbol)
                             }
                         }
                     }
@@ -158,7 +149,12 @@ fun RowScope.MorseButton(
     ) {
         Text(
             text,
-            style = MaterialTheme.typography.titleMedium
+            color = MaterialTheme.colorScheme.onPrimary,
+            style = MaterialTheme.typography.titleMedium.copy(
+                fontSize = 30.sp,
+                fontWeight = FontWeight.ExtraBold,
+                fontFamily = FontFamily.Monospace
+            )
         )
     }
 

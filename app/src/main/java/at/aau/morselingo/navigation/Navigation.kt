@@ -28,9 +28,11 @@ import at.aau.morselingo.settings.SettingsScreen
 fun AppNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    viewModel: NavigationViewModel = viewModel(factory = NavigationViewModelFactory(
-        LocalContext.current
-    ))
+    viewModel: NavigationViewModel = viewModel(
+        factory = NavigationViewModelFactory(
+            LocalContext.current
+        )
+    )
 ) {
     val settings by viewModel.settings.collectAsState()
 
@@ -44,6 +46,7 @@ fun AppNavHost(
             composable(Destination.STATISTICS.route) { StatisticsScreen() }
             composable(Destination.SETTINGS.route) { SettingsScreen() }
         }
+    }
 }
 
 @Composable
