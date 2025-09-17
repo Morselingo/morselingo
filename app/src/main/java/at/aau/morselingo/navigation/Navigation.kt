@@ -44,6 +44,7 @@ fun AppNavHost(
             composable(Destination.STATISTICS.route) { StatisticsScreen() }
             composable(Destination.SETTINGS.route) { SettingsScreen() }
         }
+    }
 }
 
 @Composable
