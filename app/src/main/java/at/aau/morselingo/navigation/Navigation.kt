@@ -21,7 +21,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import at.aau.morselingo.statistics.StatisticsScreen
 import at.aau.morselingo.practice.PracticeScreen
-import at.aau.morselingo.settings.LocalSettings
+import at.aau.morselingo.data.LocalAppSettings
 import at.aau.morselingo.settings.SettingsScreen
 
 @Composable
@@ -34,9 +34,9 @@ fun AppNavHost(
         )
     )
 ) {
-    val settings by viewModel.settings.collectAsState()
+    val appSettings by viewModel.appSettings.collectAsState()
 
-    CompositionLocalProvider(LocalSettings provides settings) {
+    CompositionLocalProvider(LocalAppSettings provides appSettings) {
         NavHost(
             navController = navController,
             startDestination = Destination.defaultDestination,

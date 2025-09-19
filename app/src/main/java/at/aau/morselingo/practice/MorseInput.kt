@@ -29,7 +29,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import at.aau.morselingo.settings.LocalSettings
+import at.aau.morselingo.data.LocalAppSettings
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
 import kotlin.system.measureTimeMillis
@@ -45,7 +45,7 @@ const val wordSeparationTime = 2
 fun MorseInput(
     onInput: (String) -> Unit
 ) {
-    val settings = LocalSettings.current
+    val settings = LocalAppSettings.current
     Column(
         verticalArrangement = Arrangement.Bottom,
         horizontalAlignment = Alignment.CenterHorizontally,

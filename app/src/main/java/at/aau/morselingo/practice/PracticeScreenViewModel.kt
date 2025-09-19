@@ -4,23 +4,35 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import at.aau.morselingo.data.AppSettings
 import at.aau.morselingo.data.MorseStats
 import at.aau.morselingo.data.MorseStatsRepository
 import at.aau.morselingo.data.MorselingoDatabase
+import at.aau.morselingo.data.SettingsRepository
 import at.aau.morselingo.trainingdata.TrainingWordsGenerator
 import at.aau.morselingo.trainingdata.WordsRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class PracticeScreenViewModel(
     private val repository: MorseStatsRepository,
-    private val wordsGenerator: TrainingWordsGenerator
+    private val wordsGenerator: TrainingWordsGenerator,
+    settingsRepository: SettingsRepository
 ) : ViewModel() {
+    val appSettings: StateFlow<AppSettings> = settingsRepository.appSettingsFlow.stateIn(
+        viewModelScope,
+        SharingStarted.Eagerly, // Always collect data (hot Flow)
+        AppSettings()
+    )
     private val _stats: MutableStateFlow<MorseStats> = MutableStateFlow(MorseStats())
     val stats: StateFlow<MorseStats> = _stats.asStateFlow()
 
@@ -30,6 +42,7 @@ class PracticeScreenViewModel(
     sealed class UiEvent {
         data class LevelUp(val level: Int) : UiEvent()
     }
+
     private val _events = MutableSharedFlow<UiEvent>()
     val events: SharedFlow<UiEvent> = _events.asSharedFlow()
 
@@ -47,23 +60,26 @@ class PracticeScreenViewModel(
 
     var charStartTime: Long = 0L // 0 represents that timing has not started
     var lang = "en"
-    var allowedChars = listOf("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z")
 
     init {
-        reload()
+        _level.value++
+        //reload()
+        viewModelScope.launch {
+            appSettings
+                .map { it.allowedChars }
+                .distinctUntilChanged()
+                .collect { allowedChars ->
+                    // call your method here
+                    reload()
+                }
+        }
     }
 
     fun reload() {
         viewModelScope.launch {
             resetInputState()
 
-            _level.value++
-
-            if (_level.value != 1) {
-                _events.emit(UiEvent.LevelUp(_level.value))
-            }
-
-            val text = getTrainingWords(_level.value, lang, allowedChars)
+            val text = getTrainingWords(_level.value, lang, appSettings.value.allowedChars)
             _expectedText.value = text
         }
     }
@@ -80,6 +96,12 @@ class PracticeScreenViewModel(
     fun onInput(symbol: String) {
         val text = expectedText.value
         if (text.isEmpty() || _currentIndex.value >= text.length - 1) {
+            _level.value++
+            viewModelScope.launch {
+                if (_level.value != 1) {
+                    _events.emit(UiEvent.LevelUp(_level.value))
+                }
+            }
             reload()
             return
         }
@@ -153,7 +175,11 @@ class PracticeScreenViewModel(
         _userInputForAttempt.value = ""
     }
 
-    private suspend fun getTrainingWords(level: Int, lang: String, allowedChars: List<String>): String {
+    private suspend fun getTrainingWords(
+        level: Int,
+        lang: String,
+        allowedChars: List<String>
+    ): String {
         val words = wordsGenerator.generate(
             level = level,
             lang = lang,
@@ -168,13 +194,14 @@ class PracticeScreenViewModelFactory(current: Context) : ViewModelProvider.Facto
     private val repository = MorseStatsRepository(database.morseStatsDao())
 
     private val wordsRepository = WordsRepository(current)
+    private val settingsRepository = SettingsRepository(current)
 
     private val wordsGenerator = TrainingWordsGenerator(wordsRepository)
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(PracticeScreenViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return PracticeScreenViewModel(repository, wordsGenerator) as T
+            return PracticeScreenViewModel(repository, wordsGenerator, settingsRepository) as T
         }
         throw IllegalArgumentException("Unknown Viewmodel Class")
     }

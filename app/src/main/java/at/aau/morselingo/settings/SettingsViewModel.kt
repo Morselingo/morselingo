@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import at.aau.morselingo.data.AppSettings
 import at.aau.morselingo.data.MorseStatsRepository
 import at.aau.morselingo.data.MorselingoDatabase
 import kotlinx.coroutines.flow.SharingStarted
@@ -11,12 +12,15 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class SettingsViewModel(private val settingsRepository: at.aau.morselingo.data.SettingsRepository, private val statsRepository: MorseStatsRepository) : ViewModel() {
+class SettingsViewModel(
+    private val settingsRepository: at.aau.morselingo.data.SettingsRepository,
+    private val statsRepository: MorseStatsRepository
+) : ViewModel() {
 
-    val settings: StateFlow<Settings> = settingsRepository.settingsFlow.stateIn(
+    val appSettings: StateFlow<AppSettings> = settingsRepository.appSettingsFlow.stateIn(
         viewModelScope,
         SharingStarted.Eagerly, // Always collect data (hot Flow)
-        Settings()
+        AppSettings()
     )
 
     fun setScoreVisibility(visibility: Boolean) {
@@ -31,12 +35,32 @@ class SettingsViewModel(private val settingsRepository: at.aau.morselingo.data.S
         viewModelScope.launch { settingsRepository.setSimpleInput(simpleInput) }
     }
 
-    fun setLongTouchTime(longTouchTime: Long){
+    fun setLongTouchTime(longTouchTime: Long) {
         viewModelScope.launch { settingsRepository.setLongTouchTime(longTouchTime) }
     }
 
-    fun deleteStatistics(){
+    fun deleteStatistics() {
         viewModelScope.launch { statsRepository.deleteAllData() }
+    }
+
+    fun setAllowedChars(charAmount: Int) {
+        viewModelScope.launch { settingsRepository.setAllowedChars(charAmount) }
+    }
+
+    fun addOneAllowedChars() {
+        if (appSettings.value.allowedChars.size < settingsRepository.maxAllowedChars) {
+            viewModelScope.launch {
+                settingsRepository.addOneAllowedChar()
+            }
+        }
+    }
+
+    fun removeOneAllowedChars() {
+        if (appSettings.value.allowedChars.size > settingsRepository.minAllowedChars) {
+            viewModelScope.launch {
+                settingsRepository.removeOneAllowedChar()
+            }
+        }
     }
 
 

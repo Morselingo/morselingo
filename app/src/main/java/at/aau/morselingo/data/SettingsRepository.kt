@@ -1,45 +1,84 @@
 package at.aau.morselingo.data
 
 import android.content.Context
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.*
-import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-private val Context.dataStore:DataStore<Preferences> by preferencesDataStore("settings")
-
-object SettingsKeys {
-    val SCORE_VISIBILITY = booleanPreferencesKey("score_visibility")
-    val HINT_VISIBILITY = booleanPreferencesKey("hint_visibility")
-
-    val SIMPLE_INPUT = booleanPreferencesKey("simple_input")
-    val LONG_TOUCH_TIME = longPreferencesKey("long_touch_time")
-}
-
 class SettingsRepository(private val context: Context) {
-    val settingsFlow: Flow<at.aau.morselingo.settings.Settings> = context.dataStore.data.map { prefs ->
-        _root_ide_package_.at.aau.morselingo.settings.Settings(
-            scoreVisibility = prefs[SettingsKeys.SCORE_VISIBILITY] ?: false,
-            hintVisibility = prefs[SettingsKeys.HINT_VISIBILITY] ?: false,
-            simpleInput = prefs[SettingsKeys.SIMPLE_INPUT] ?: true,
-            longTouchTime = prefs[SettingsKeys.LONG_TOUCH_TIME] ?: 1000L
-        )
-    }
+    val minAllowedChars = 5
+    val maxAllowedChars = 26
+    val charList: List<String> = listOf("e", "t", "i", "a", "n", "m", "s", "u", "r", "w", "d", "k", "g", "o", "h", "v", "f", "l", "p", "j", "b", "x", "c", "y", "z", "q")
+    val appSettingsFlow: Flow<AppSettings> =
+        context.settingsDataStore.data.map { it.toDomain() }
+
 
     suspend fun setScoreVisibility(visibility: Boolean) {
-        context.dataStore.edit { it[SettingsKeys.SCORE_VISIBILITY] = visibility }
+        context.settingsDataStore.updateData { proto ->
+            proto.toBuilder()
+                .setScoreVisibility(visibility)
+                .build()
+        }
     }
 
     suspend fun setHintVisibility(visibility: Boolean) {
-        context.dataStore.edit { it[SettingsKeys.HINT_VISIBILITY] = visibility }
+        context.settingsDataStore.updateData { proto ->
+            proto.toBuilder()
+                .setHintVisibility(visibility)
+                .build()
+        }
     }
 
     suspend fun setSimpleInput(simpleInput: Boolean) {
-        context.dataStore.edit { it[SettingsKeys.SIMPLE_INPUT] = simpleInput }
+        context.settingsDataStore.updateData { proto ->
+            proto.toBuilder()
+                .setSimpleInput(simpleInput)
+                .build()
+        }
     }
 
-    suspend fun setLongTouchTime(longTouchTime: Long){
-        context.dataStore.edit { it[SettingsKeys.LONG_TOUCH_TIME] = longTouchTime }
+    suspend fun setLongTouchTime(longTouchTime: Long) {
+        context.settingsDataStore.updateData { proto ->
+            proto.toBuilder()
+                .setLongTouchTime(longTouchTime)
+                .build()
+        }
+    }
+
+    suspend fun setAllowedChars(amount: Int) {
+        require(amount >= 5) { "allowedChars must contain at least 5 characters" } // if ui check fails
+        context.settingsDataStore.updateData { proto ->
+            proto.toBuilder()
+                .clearAllowedChars()
+                .addAllAllowedChars(charList.take(amount))
+                .build()
+        }
+    }
+
+    suspend fun addOneAllowedChar() {
+        context.settingsDataStore.updateData { proto ->
+            val current = proto.allowedCharsList.toMutableList()
+            if (current.size >= 26) {
+                throw IllegalStateException("Cannot add more characters, AllowedChar is full")
+            }
+            current.add(charList[current.size])
+            proto.toBuilder()
+                .clearAllowedChars()
+                .addAllAllowedChars(current)
+                .build()
+        }
+    }
+
+    suspend fun removeOneAllowedChar() {
+        context.settingsDataStore.updateData { proto ->
+            val current = proto.allowedCharsList.toMutableList()
+            if (current.size <= minAllowedChars) {
+                throw IllegalStateException("Cannot remove more characters, AllowedChar is at minimum: $minAllowedChars")
+            }
+            current.removeLast()
+            proto.toBuilder()
+                .clearAllowedChars()
+                .addAllAllowedChars(current)
+                .build()
+        }
     }
 }
