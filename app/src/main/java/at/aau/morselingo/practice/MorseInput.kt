@@ -32,7 +32,6 @@ import androidx.compose.ui.unit.sp
 import at.aau.morselingo.data.LocalAppSettings
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
-import kotlin.system.measureTimeMillis
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
 
@@ -121,25 +120,28 @@ fun RowScope.MorseButton(
                     var timerJob: Job? = null // for timing end of word
 
                     while (true) {
-                        var up: PointerInputChange? = null
+                        var up: PointerInputChange?
                         awaitPointerEventScope {
                             awaitFirstDown()
                             timerJob?.cancel()
-                            val duration = measureTimeMillis {
-                                up = waitForUpOrCancellation()
-                            }
-                            if (up == null) {
-                                // Handle error
-                            }
-                            if (duration < longTouchTime) {
-                                onInput(dot)
-                            } else {
+                            var triggered = false
+                            val longPressJob = launch {
+                                delay(longTouchTime)
                                 onInput(line)
+                                triggered = true
                             }
-
-                            timerJob = launch {
-                                delay(longTouchTime * wordSeparationTime)
-                                onInput(spaceSymbol)
+                            up = waitForUpOrCancellation()
+                            longPressJob.cancel()
+                            if (up != null) {
+                                if (!triggered) {
+                                    onInput(dot)
+                                }
+                                timerJob = launch {
+                                    delay(longTouchTime * wordSeparationTime)
+                                    onInput(spaceSymbol)
+                                }
+                            } else {
+                                // Handle Touch error
                             }
                         }
                     }
