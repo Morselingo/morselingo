@@ -27,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import at.aau.morselingo.data.LocalAppSettings
 import java.text.DecimalFormat
 
 @Composable
@@ -86,14 +87,16 @@ fun CharTile(char: String, score: Float) {
                 modifier = Modifier.align(Alignment.Center)
             )
             //TODO: maybe add a toggle for the score
-            Text(
-                text = DecimalFormat("0.00").format(score),
-                color = textColor,
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(6.dp)
-            )
+            if(LocalAppSettings.current.scoreVisibility) {
+                Text(
+                    text = DecimalFormat("0.00").format(score),
+                    color = textColor,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(6.dp)
+                )
+            }
         }
     }
 }

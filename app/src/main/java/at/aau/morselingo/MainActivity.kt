@@ -9,14 +9,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
 import at.aau.morselingo.navigation.AppNavBar
 import at.aau.morselingo.navigation.AppNavHost
-import at.aau.morselingo.settings.LocalSettings
-import at.aau.morselingo.settings.Settings
 import at.aau.morselingo.ui.theme.MorselingoTheme
 
 class MainActivity : ComponentActivity() {
@@ -25,7 +22,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MorselingoTheme {
-               Morselingo()
+                Morselingo()
             }
         }
     }
@@ -36,24 +33,22 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Morselingo() {
     val navController = rememberNavController()
-    val settings: Settings = Settings()
-    CompositionLocalProvider(LocalSettings provides settings) {
-        Scaffold(
-            topBar = {
-                //TODO: add topbar support with changing title depending on screen
+
+    Scaffold(
+        topBar = {
+            //TODO: add topbar support with changing title depending on screen
 //            TopAppBar(
 //               title = { Text("Test") },
 //            )
-            },
-            bottomBar = {
-                AppNavBar(navController = navController)
-            },
-            modifier = Modifier.fillMaxSize()
-        ) { innerPadding ->
-            AppNavHost(
-                navController = navController,
-                modifier = Modifier.padding(innerPadding)
-            )
-        }
+        },
+        bottomBar = {
+            AppNavBar(navController = navController)
+        },
+        modifier = Modifier.fillMaxSize()
+    ) { innerPadding ->
+        AppNavHost(
+            navController = navController,
+            modifier = Modifier.padding(innerPadding)
+        )
     }
 }

@@ -4,7 +4,9 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.protobuf)
 }
+
 
 android {
     namespace = "at.aau.morselingo"
@@ -41,7 +43,9 @@ android {
     buildFeatures {
         compose = true
     }
+    
 }
+
 
 dependencies {
     implementation(libs.androidx.core.ktx)
@@ -57,8 +61,8 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.material3)
     implementation(libs.ui)
-    implementation(libs.androidx.datastore.preferences)
-    implementation(libs.androidx.datastore.core)
+    implementation(libs.androidx.datastore.proto)
+    implementation(libs.protobuf)
     implementation(libs.gson)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.runtime)
@@ -75,4 +79,18 @@ dependencies {
 
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+}
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.25.3"
+    }
+    generateProtoTasks {
+        all().forEach { task ->
+            task.builtins {
+                create("java"){
+                    option("lite")
+                }
+            }
+        }
+    }
 }

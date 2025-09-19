@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+option java_package = "at.aau.morselingo.data";
+option java_multiple_files = true;
+
+message Settings {
+  bool score_visibility = 1;
+  repeated string allowed_chars = 2;
+  bool hint_visibility = 3;
+  bool simple_input = 4;
+  int64 long_touch_time = 5;
+}

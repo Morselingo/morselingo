@@ -18,6 +18,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import at.aau.morselingo.data.LocalAppSettings
 
 @Composable
 fun PracticeScreen(
@@ -29,7 +30,7 @@ fun PracticeScreen(
    val statsForCurrentAttempt by viewModel.stats.collectAsState()
    val currentIndex by viewModel.currentIndex.collectAsState()
    val expectedText by viewModel.expectedText.collectAsState()
-   val showHints = true // TODO: get from settings
+   val showHints = LocalAppSettings.current.hintVisibility
 
    var showLevelUp by rememberSaveable { mutableStateOf(false) }
    var reachedLevel by rememberSaveable { mutableIntStateOf(1) }
@@ -46,8 +47,7 @@ fun PracticeScreen(
    // TODO: figure out how to do the reset when the test is done
 
    MorseInput(
-      viewModel::onInput,
-      clickSpeed = 0,
+      viewModel::onInput
    )
 
    Column(

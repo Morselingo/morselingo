@@ -1,7 +1,7 @@
-package at.aau.morselingo.settings
+package at.aau.morselingo.data
 import androidx.compose.runtime.staticCompositionLocalOf
 
 // Holds Settings (could be data class, ViewModel, etc.)
-val LocalSettings = staticCompositionLocalOf<Settings> {
+val LocalAppSettings = staticCompositionLocalOf<AppSettings> {
     error("No Settings provided")
 }
