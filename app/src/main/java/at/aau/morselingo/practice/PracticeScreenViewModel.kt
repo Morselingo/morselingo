@@ -41,6 +41,7 @@ class PracticeScreenViewModel(
 
     sealed class UiEvent {
         data class LevelUp(val level: Int) : UiEvent()
+        object Vibrate : UiEvent()
     }
 
     private val _events = MutableSharedFlow<UiEvent>()
@@ -101,6 +102,7 @@ class PracticeScreenViewModel(
                 if (_level.value != 1) {
                     _events.emit(UiEvent.LevelUp(_level.value))
                 }
+                _events.emit(UiEvent.Vibrate)
             }
             reload()
             return
